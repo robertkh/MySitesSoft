@@ -1,0 +1,8 @@
+#diag_table td, #diag_table th {
+    text-align: center;
+    vertical-align: bottom;  
+}
+#diag_table td {
+    background-color: #b3d9ff;
+    border:1px solid white;
+}

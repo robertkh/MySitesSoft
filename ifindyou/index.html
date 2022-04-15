@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>findme</title>
+    <meta charset = "UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="google-signin-client_id" content="707585456404-jb80d17uk93arg004p2gfrqumsg463ba.apps.googleusercontent.com">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="/js/browser.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+    <link href='//fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+    <style>
+        img {pointer-events: none;}
+        .w3-bar-item {font-size: 25px;}
+        .logo {font-family: 'Pacifico'}
+        .or {color: orange}
+        .ptr {cursor:pointer;}
+    </style>
+</head>
+<body>
+<div id='panel' class="w3-container w3-light-green w3-center w3-large w3-padding-tiny" style="display:none; position: absolute; width:100%; z-index:1;">
+  <i class="fa fa-check-square-o" style="color:green"></i>
+  <span></span>
+  <a href ='#' class ='w3-closebtn w3-text-white w3-hover-text-black' onclick="$('#panel').hide()">&times;</a>
+</div>
+<div id="user_nav" class="w3-modal">
+    <nav class="w3-container w3-sidenav w3-card-2  w3-top w3-animate-left w3-text-blue-grey" style="width:260px;z-index:2">
+        <div class="w3-section w3-padding-16 w3-center w3-light-grey  w3-xlarge w3-card-2">
+            <span class="w3-xlarge or"><i class="fa fa-user"></i></span><br>
+            <span class="w3-padding-8 w3-text-center logo w3-text-blue-grey" id = 'who'></span>
+        </div>
+        <div class="w3-section w3-padding-16 w3-light-grey w3-text-blue-grey w3-card-2">
+            <div class="w3-container w3-padding-16">
+                <span class="ptr w3-block w3-hover-text-orange " onclick="reg()"><i class="fa fa-registered or"></i> Sign Up</span>
+            </div>
+            <div class="w3-container w3-padding-16">
+                <span class="ptr w3-block w3-hover-text-orange" onclick="log()"><i class="fa fa-sign-in or"></i> Sign In</span>
+            </div>
+            <div class="w3-container w3-padding-16">
+                <span class="ptr w3-block w3-hover-text-orange" onclick='out()'><i class="fa fa-sign-out or"></i> Sign Out</span>
+            </div>
+            <div class="w3-container w3-padding-16">
+                <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            </div>
+            <div class="w3-container w3-padding-16">
+                <span class="ptr w3-block w3-hover-text-orange" onclick='af()'><i class="fa fa-plus-circle or"></i> Add Friend</span>
+            </div>
+            <div class="w3-container w3-padding-16">
+                <span class="ptr w3-block w3-hover-text-orange" onclick='df()'><i class="fa fa-remove or"></i> Del Friend</span>
+            </div>
+        </div>      
+  </nav>
+</div>
+
+<!-- ========================     =========================== -->
+<div class="w3-bar w3-border  w3-teal">
+    <div class="w3-col w3-bar-item " style = 'width:20%'>
+        <span class="w3-bar-item w3-button w3-hover-none w3-text-grey w3-hover-text-white w3-xlarge w3-padding-medium" onclick="$('#user_nav').show()"><i class="fa fa-bars" ></i></span>
+    </div>
+    <div class="w3-col w3-bar-item w3-center" style = 'width:60%'>
+        <span class="w3-wide logo">Find me</span>
+    </div>
+</div> 
+<div id="map" style="width:100%;height:400px"></div>
+<!--  ****************************   Թողնել haxordadrutyun    **************************  -->
+<div id='af' class='w3-modal'>
+    <div class="w3-modal-content w3-card-4 w3-animate-top" style="max-width:600px">
+        <div class="w3-container w3-center w3-light-grey">
+            <h5>Add Friend</h5>
+        </div>    
+        <form id = 'af_f' class="w3-container">
+            <div class="w3-section">
+                <input id ="id_af" class="w3-input w3-border" type="text" placeholder="Enter friend's name">
+            </div>
+        </form>        
+        <div class="w3-container w3-border-top w3-padding-8 w3-light-grey">
+            <button onclick ="ajax_af()" class="w3-btn w3-green" >Submit</button>
+            <button class="w3-btn w3-red w3-right" onclick = "$('#af').hide()">Cancel</button>
+        </div>
+    </div>
+</div>
+<div id='df' class='w3-modal'>
+    <div class="w3-modal-content w3-card-4 w3-animate-top" style="max-width:600px">
+        <div class="w3-container w3-center w3-light-grey">
+            <h5>Del Friend</h5>
+        </div>    
+        <form id = 'df_f' class="w3-container">
+            <div class="w3-section">
+                <input id ="id_df" class="w3-input w3-border" type="text" placeholder="Enter friend's name">
+            </div>
+        </form>        
+        <div class="w3-container w3-border-top w3-padding-8 w3-light-grey">
+            <button onclick ="ajax_df()" class="w3-btn w3-green" >Submit</button>
+            <button class="w3-btn w3-red w3-right" onclick = "$('#df').hide()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id='mess' class='w3-modal'>
+    <div class="w3-modal-content w3-card-8 w3-animate-top" style="max-width:400px">   
+        <div class = "w3-container w3-center w3-light-grey">
+                        <h5>Հաղորդագրություն</h5>
+        </div>
+        <div class="w3-container w3-padding-8" >
+            To : <span id ='to'></span>
+            <div id='v_mess' class="w3-padding-small  w3-border " style="height: 100px; overflow: auto;">
+            </div>
+        </div>
+        <div class="w3-padding-medium">
+            From : <span id = 'fr'></span> 
+            <textarea id='s_mess' class="w3-padding-small" style="height: 30px; width:100%;"></textarea>
+        </div>
+        <div class="w3-container w3-border-top w3-padding-8 w3-light-grey">
+          <button class="w3-btn w3-green" onclick ="s_mess()">Submit</button>
+          <button class="w3-btn w3-red w3-right" onclick = "ping_end()">Cancel</button>
+        </div>
+    </div>
+</div> 
+
+<!-- ========================   M O D A L    A L E R T    ==================== -->
+<div id="alert" class="w3-modal">
+    <div id = 'alert_1' class="w3-modal-content w3-card-8" style="width:400px; top:100px;">
+        <header id='al_head' class="w3-container">        
+            <span onclick="$('#alert').hide()" class="w3-closebtn w3-padding-top w3-large">&times;</span>
+            <h5>Message from <span class='logo'>findme</span> :</h5>
+        </header>
+        <div id="message" class="w3-large w3-padding-large w3-small"></div>
+    </div>
+</div>   
+<!-- =====================   L O G I N   ========================= -->
+<div id="log_f" class='w3-modal'>
+    <div class="w3-modal-content w3-card-8 w3-animate-zoom" style="max-width:600px">         
+        <div class="w3-center"><br>
+            <span class = "w3-xxlarge w3-padding-medium"><i class='fa fa-user'></i></span>
+        </div>    
+        <form class="w3-container" id ='log_f_f'>
+            <div class="w3-section">
+            <input class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username"  id ="id_user1" required>
+            <input class="w3-input w3-border" type="password" placeholder="Enter Password" id ="id_psw1" required>
+            <button type='button' class="w3-btn-block w3-green w3-section w3-padding" onclick ="log_in()">login</button>
+            </div>
+        </form>      
+        <div class="w3-container w3-border-top w3-padding-16 w3-light-grey">
+            <button onclick = "$('#log_f').hide()" type = "button" class = "w3-btn w3-red">Cancel</button>
+            <span class="w3-right w3-padding"> Forgot <a href="#" onclick ="frg()">password?</a></span>
+            <span class="w3-right w3-padding"> Change <a href="#" onclick ="ch_psw1()">password?</a></span>
+        </div>     
+    </div>
+</div> 
+<!-- ========================   R E G I S T E R   =========================== -->
+<div id='reg_f' class='w3-modal'>
+    <div class="w3-modal-content w3-card-8 w3-animate-top" style = 'max-width:600px'>
+        <div class = "w3-container w3-center w3-light-grey">
+            <h5>Sign Up</h5>
+        </div>
+        <form id = 'reg_f_f' class="w3-container">
+            <div class="w3-section">
+                <input id ="id_user2" oninput="" class="w3-input w3-border w3-margin-bottom" type="text" placeholder="Enter Username"  required>
+                <input id ="id_email" onblur = "" class="w3-input w3-border w3-margin-bottom" type="email" placeholder="Enter Email"  required>
+                <input id ="id_psw2" oninput="" class="w3-input w3-border" type="password" placeholder="Enter Password"  required>
+            </div>
+        </form>
+        <div class="w3-container w3-border-top w3-padding-8 w3-light-grey">
+            <button class="w3-btn w3-green" onclick ="create_new_user()">Submit</button>
+            <button class="w3-btn w3-red w3-right" onclick = "$('#reg_f').hide()">Cancel</button>
+        </div>      
+    </div>
+</div>
+<!-- ========================     =========================== -->
+<script type="text/javascript">
+function myMap() {
+  var myCenter = new google.maps.LatLng( 40.177528866942254,44.51252472528722);
+  var mapCanvas = document.getElementById("map");
+  var mapOptions = {center: myCenter, zoom: 13};
+  gl_map = new google.maps.Map(mapCanvas, mapOptions);
+}
+</script> 
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBcpZjYtQpdQumA2nkmA9qwikS8hWwJfaE&callback=myMap"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<br><div class="w3-container w3-center">
+<input id='btn1' type="button" class="w3-button  w3-teal" onclick="pub();" style="width:120px" value="pub"/>
+<input id='btn2' type="button" disabled class="w3-button  w3-teal" onclick="hideLocation();" style="width:120px" value="clear"/>
+</div>
+
+<form class="w3-container">
+    <br><label class="w3-text-teal">accuracy</label>
+    <input class="w3-input" type="text" id='btn3' value = ''>
+    <br><label class="w3-text-teal">last_dist</label>
+    <input class="w3-input" type="text" id='btn4' value = ''>
+    <br><label class="w3-text-teal">all_dist</label>
+    <input class="w3-input" type="text" id='btn5' value = ''>
+    <br>
+</form>
+
+
+</body>
+</html>

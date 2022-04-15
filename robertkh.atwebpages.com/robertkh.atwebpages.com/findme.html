@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>findme</title>
+    <meta charset = "UTF-8">
+
+    <script src="js/jquery-3.1.1.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css">
+    <script type = "text/javascript" src = "js/dimord_script.js"></script> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/lib/w3.css">
+    <link href='//fonts.googleapis.com/css?family=Pacifico' rel='stylesheet'>
+</head>
+<body>
+<div id="map" style="width:100%;height:500px"></div>
+<div class="w3-section w3-content w3-center">
+    <form>
+        <input id='btn3' type="button" onclick="open_close()" value="Connect"/>
+        <input id='btn1' type="button" onclick="getLocationUpdate();" value="Locate me"/>
+    </form>
+</div> 
+<p id = 'info'></p>
+<!--  ****************************   Թողնել haxordadrutyun    **************************  -->
+<div id='mess' class='w3-modal'>
+    <div class="w3-modal-content w3-card-8 w3-animate-top" style="max-width:400px">   
+        <div class = "w3-container w3-center w3-light-grey">
+                        <h5>Հաղորդագրություն</h5>
+        </div>
+        <div class="w3-container w3-padding-8" >
+            To : <span id ='to'></span>
+            <div id='v_mess' class="w3-padding-small  w3-border " style="height: 100px; overflow: auto;">
+            </div>
+        </div>
+        <div class="w3-padding-medium">
+            From : <span id = 'fr'></span> 
+            <textarea id='s_mess' class="w3-padding-small" style="height: 30px; width:100%;"></textarea>
+        </div>
+        <div class="w3-container w3-border-top w3-padding-8 w3-dark-grey">
+          <button class="w3-btn w3-green" onclick ="s_mess()">Submit</button>
+          <button class="w3-btn w3-red w3-right" onclick = "ping_end()">Cancel</button>
+        </div>
+    </div>
+</div>  
+<!-- ============================================================================================================================ -->
+<script>
+var gl_arr_marker = [];
+var gl_map, gl_name, gl_latitude, gl_longitude, gl_me;
+var watchID, w_key=0, c_key = 0;
+var geoLoc;
+var source, source_chat;
+if(navigator.geolocation)
+    geoLoc=navigator.geolocation;
+else
+    alert("Sorry, browser does not support geolocation!");
+</script>
+<script> 
+function myMap() {
+  var myCenter = new google.maps.LatLng( 40.177528866942254,44.51252472528722);
+  var mapCanvas = document.getElementById("map");
+  var mapOptions = {center: myCenter, zoom: 13};
+  gl_map = new google.maps.Map(mapCanvas, mapOptions);
+}
+</script>
+<!-- =============================================================================================================================== -->  
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQyiSccIIGMI30DE_ztJWxFz_sqg_rMDA&callback=myMap"></script>
+<!-- =============================================================================================================================== -->	
+<script>
+function open_close()
+{
+    if(c_key)
+    {
+        c_key=0; 
+        $('#btn3').val('Connect');
+        source.close();
+        console.log('disconeted');
+    }
+    else
+    {
+        open_cn();
+        $('#btn3').val('please wait...');
+    }
+}
+//function close_cn(){ }
+function open_cn()
+{
+    if(typeof(EventSource) == "undefined") { my_alert("Sorry, your browser does not support "); return; }
+    source = new EventSource("map1.php");
+    source.addEventListener("open", function(e) {
+        console.log('Connection has opened');$('#btn3').val('Disconnect'); c_key = 1;
+    }, false);
+
+    source.addEventListener("error", function(e) {
+        if(e.readyState==EventSource.CLOSED) alert('Connection was closed');
+
+    }, false);
+    
+    source.addEventListener("map", function(e) 
+    { 
+       // $('#btn3').val('Disconnect');
+        var r = e.data;
+        js_arr= JSON.parse(r);
+       
+        for (var i = 0; i < js_arr.length; i++) 
+        {
+            var new_user = true;
+            for (var j = 0; j < gl_arr_marker.length; j++) 
+            {
+                if(js_arr[i][0]==gl_arr_marker[j][0] )
+                {
+                    new_user=false;
+                    if(js_arr[i][3]==1)
+                    {
+                        var latlng =  new google.maps.LatLng(js_arr[i][1], js_arr[i][2]);
+                        gl_arr_marker[j][1].setPosition(latlng);
+                        gl_arr_marker[j][1].setMap(gl_map);
+                    }
+                    else
+                    {
+                        gl_arr_marker[j][1].setMap(null);  
+                    }
+                    if(js_arr[i][0]==gl_arr_marker[j][0] ) break;
+                }
+               
+            }
+
+            if(new_user && (js_arr[i][3]==1))
+            {
+                console.log('new_user');
+                var latlng =  new google.maps.LatLng(js_arr[i][1], js_arr[i][2]);
+                var marker =  new google.maps.Marker({
+                        info : new google.maps.InfoWindow({ content: js_arr[i][0] })
+                    });
+
+                marker.setPosition(latlng);
+                marker.setMap(gl_map);
+                marker.info.open(map, marker);
+                gl_arr_marker.push([ js_arr[i][0], marker]);
+                marker.addListener('click', function() { 
+                    $('#fr').text(gl_me);
+                    $('#to').text(this.info.content);
+                    $('#mess').show();
+                              
+                });
+            }
+        }
+    }, false);
+
+    source.addEventListener("ping", function(e) {
+        js_e= JSON.parse(e.data);
+        if(js_e[1]==gl_me)
+        {
+            $('#fr').text(js_e[1]);
+            $('#to').text(js_e[0]);
+            var txt = js_e[0]+':'+js_e[2]+'<br>';
+            console.log(txt);
+            $('#v_mess').prepend(txt);
+            $('#mess').show();
+        }  
+    }, false);
+}
+</script>
+<script>
+function s_mess()
+{
+    var send_var = "to="+$('#to').text()+"&from="+$('#fr').text()+"&text="+$('#s_mess').val();
+    //$('#mess').hide();
+    serv_cn('map2.php', send_var, s_s_mess,e);
+}
+var s_s_mess = function(r) { 
+    var txt = $('#fr').text()+':'+$('#s_mess').val()+'<br>';
+    $('#v_mess').prepend(txt);
+    $('#s_mess').val('');
+    console.log(r); 
+}
+function ping_end()
+{
+    $('#v_mess').text('');
+    $('#mess').hide();
+}
+</script>
+<script>         
+function showLocation(position) {
+   var latitude = position.coords.latitude; 
+   var longitude = position.coords.longitude;
+   var send_var = 'lt='+latitude+'&lg='+longitude;
+   w_key=1;
+   $('#btn1').val('Hide me');
+   serv_cn('map.php', send_var,s_map,e);
+}
+var s_map = function(r) {gl_me=r;}
+     
+function errorHandler(err) {
+   if(err.code == 1) {
+      alert("Error: Access is denied!");
+   }
+   else if( err.code == 2) {
+      alert("Error: Position is unavailable!");
+   }
+   else if( err.code == 3) {
+      alert("Error: timeout!");
+   }
+}
+      
+function getLocationUpdate()
+{
+    if(w_key)
+    {
+        geoLoc.clearWatch(watchID);
+        $('#btn1').val('Locate me');
+        w_key = 0;
+        serv_cn('hide.php',null);
+    }
+    else
+    {
+        watchID=geoLoc.watchPosition(showLocation, errorHandler,  {enableHighAccuracy:true,maximumAge:30000,timeout:27000});
+        $('#btn1').val('please wait...');
+    }
+}
+</script>
+<script>
+function find_name(fild) {
+    var name = fild + "=";
+    var decodedCookie = decodeURIComponent(document.cookie);
+    var ca = decodedCookie.split(';');
+    for(var i = 0; i <ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+</script>
+<script>
+gl_me=find_name('dimord_user');
+if(gl_me =='') 
+{
+    my_alert('Ձեր սեսիայի ժամանակն ավարտվել է, նորից մուտք արեք համակարգ։')
+    $('input').attr('disabled','true');
+}
+</script>
+<script>
+/*function f_end()
+{ 
+    $('#btn1').attr('disabled',false);
+    $('#btn2').attr('disabled',true);
+   geoLoc.clearWatch(watchID);
+   serv_cn('hide.php',null);
+}*/
+</script>
+<script>
+/*function myFunction() {
+  
+    setInterval(function(){ 
+        if(typeof(source)=='undefined')
+            alert("source is undefined"); }, 10000);
+}*/
+</script>
+<!-- =============================================================================================================================== -->  
+
+</body>
+</html>

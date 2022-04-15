@@ -1,0 +1,19 @@
+{
+  "name": "node-example",
+  "version": "0.0.1",
+  "dependencies": {
+    "body-parser": "1.17.2",
+    "express": "4.15.3",
+    "mongoose": "4.x",
+    "node-static": "0.7.9",
+    "serve-favicon": "^2.5.0",
+    "ws": "^3.3.3"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": "6.11.1",
+    "npm": "3.10.10"
+  }
+}
